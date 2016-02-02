@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Patcher.html</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="SynEdit HTML exporter" />
+<style type="text/css">
+<!--
+body { color: #000000; background-color: #FFFFFF; }
+.pas1-assembler { }
+.pas1-character { }
+.pas1-comment { font-style: italic; }
+.pas1-float { }
+.pas1-hexadecimal { }
+.pas1-identifier { }
+.pas1-number { }
+.pas1-preprocessor { font-style: italic; }
+.pas1-reservedword { font-weight: bold; }
+.pas1-space { }
+.pas1-string { }
+.pas1-symbol { }
+-->
+</style>
+</head>
+<body>
+<pre>
+<code><span style="font: 10pt Courier New;"><span class="pas1-reservedword">unit</span><span class="pas1-space"> Unit1;
+   
+   </span><span class="pas1-reservedword">interface
+</span><span class="pas1-space">   
+   </span><span class="pas1-reservedword">uses
+</span><span class="pas1-space">      Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+      Dialogs, StdCtrls,MiniFMOD, ExtCtrls, Effects;
+      
+   </span><span class="pas1-reservedword">type
+</span><span class="pas1-space">      Tpatch = </span><span class="pas1-reservedword">class</span><span class="pas1-symbol">(TForm)
+      OpenDialog1: TOpenDialog;
+      fond: TImage;
+      Open: TImage;
+      original: TLabel;
+      patch: TImage;
+
+    </span><span class="pas1-reservedword">procedure</span><span class="pas1-space"> OpenClick(Sender: TObject);
+    </span><span class="pas1-reservedword">procedure</span><span class="pas1-space"> patchClick(Sender: TObject);
+
+   </span><span class="pas1-reservedword">private
+</span><span class="pas1-space">   </span><span class="pas1-comment">{ Private declarations }
+</span><span class="pas1-space">   </span><span class="pas1-reservedword">public
+</span><span class="pas1-space">   </span><span class="pas1-comment">{ Public declarations }
+</span><span class="pas1-reservedword">end</span><span class="pas1-symbol">;
+
+   </span><span class="pas1-reservedword">var
+</span><span class="pas1-space">      patch: Tpatch;
+
+</span><span class="pas1-reservedword">implementation
+
+
+</span><span class="pas1-preprocessor">{$R *.dfm}
+{$R sequelinha.res}
+
+
+</span><span class="pas1-reservedword">procedure</span><span class="pas1-space"> BackupFile(</span><span class="pas1-reservedword">const</span><span class="pas1-space"> FileName, BackupExt: </span><span class="pas1-reservedword">string</span><span class="pas1-symbol">; </span><span class="pas1-reservedword">const</span><span class="pas1-space"> BackupConfirm: boolean);
+</span><span class="pas1-reservedword">var</span><span class="pas1-space"> cnt: boolean;
+</span><span class="pas1-reservedword">begin
+</span><span class="pas1-space">      cnt := true;
+      </span><span class="pas1-reservedword">if</span><span class="pas1-space"> BackupConfirm </span><span class="pas1-reservedword">then
+</span><span class="pas1-space">         cnt := MessageDlg('Criar Backup '+         </span><span class="pas1-comment">//messageBox Criar backup
+</span><span class="pas1-space">      ExtractFileName(FileName)+' ?',                </span><span class="pas1-comment">//Pega o nome do Programa
+</span><span class="pas1-space">      mtConfirmation, [mbYes,mbNo],0) = mrYes;       </span><span class="pas1-comment">//Botao sim ou nao
+</span><span class="pas1-space">      </span><span class="pas1-reservedword">if</span><span class="pas1-space"> </span><span class="pas1-reservedword">not</span><span class="pas1-space"> cnt </span><span class="pas1-reservedword">then
+</span><span class="pas1-space">         exit;
+
+      CopyFile(PChar(FileName),                      </span><span class="pas1-comment">//cCopia o Software
+</span><span class="pas1-space">      PChar(ChangeFileExt(FileName, BackupExt)),
+      false);
+   </span><span class="pas1-reservedword">end</span><span class="pas1-symbol">;
+
+</span><span class="pas1-reservedword">procedure</span><span class="pas1-space"> Tpatch.OpenClick(Sender: TObject);
+</span><span class="pas1-reservedword">begin
+</span><span class="pas1-space"> </span><span class="pas1-reservedword">if</span><span class="pas1-space"> opendialog1.execute </span><span class="pas1-reservedword">then
+begin
+</span><span class="pas1-space"> original.caption:=OpenDialog1.FileName;
+BackupFile(OpenDialog1.FileName, '.bak', true); </span><span class="pas1-comment">// Cria um backup .bak....
+</span><span class="pas1-reservedword">end</span><span class="pas1-symbol">;
+</span><span class="pas1-reservedword">end</span><span class="pas1-symbol">;
+
+
+</span><span class="pas1-reservedword">procedure</span><span class="pas1-space"> Tpatch.patchClick(Sender: TObject);
+</span><span class="pas1-reservedword">var
+</span><span class="pas1-identifier">FB : </span><span class="pas1-reservedword">File</span><span class="pas1-space"> </span><span class="pas1-reservedword">Of</span><span class="pas1-space"> Byte;
+b : Byte;
+</span><span class="pas1-reservedword">begin</span><span class="pas1-space">  </span><span class="pas1-comment">//Primeiro
+</span><span class="pas1-identifier">assignfile(FB , original.caption);   </span><span class="pas1-comment">// Pega arquivo executavel e e carrega na Edit!
+</span><span class="pas1-identifier">Reset(FB);
+b := $90;                          </span><span class="pas1-comment">//Adiciona um NOP(No Operation) Nenhuma opera&Atilde;&sect;&Atilde;&pound;o trava o programa nesse ponto ao endere&Atilde;&sect;o
+</span><span class="pas1-identifier">seek(FB,$0000245C);         </span><span class="pas1-comment">//offset do Patcher convertir esse numero com o LordPE VA VRA Offset consegui no OllyDBG
+</span><span class="pas1-identifier">Write(FB,b);                   </span><span class="pas1-comment">// Modifica as linhas
+</span><span class="pas1-identifier">closefile(FB);                 </span><span class="pas1-comment">//Fecha o programa
+// SEGUE O MESMO PROCESSO NOVAMENTE DEPENDENDO QUANTOS NOPS E ADICIONADO NO OLLYDBG
+</span><span class="pas1-reservedword">begin</span><span class="pas1-space">  </span><span class="pas1-comment">//Segunda
+</span><span class="pas1-identifier">assignfile(FB , original.caption);
+Reset(FB);
+b := $90;
+seek(FB,$0000245D);
+Write(FB,b);
+closefile(FB);
+</span><span class="pas1-reservedword">begin</span><span class="pas1-space">      </span><span class="pas1-comment">//Terceira
+</span><span class="pas1-identifier">assignfile(FB , original.caption);
+Reset(FB);
+b := $90;
+seek(FB,$0000245E);
+Write(FB,b);
+closefile(FB);
+</span><span class="pas1-reservedword">begin</span><span class="pas1-space">   </span><span class="pas1-comment">//Quarta
+</span><span class="pas1-identifier">assignfile(FB , original.caption);
+Reset(FB);
+b := $90;
+seek(FB,$0000245F);
+Write(FB,b);
+closefile(FB);
+</span><span class="pas1-reservedword">begin</span><span class="pas1-space">    </span><span class="pas1-comment">//Quinta
+</span><span class="pas1-identifier">assignfile(FB , original.caption);
+Reset(FB);
+b := $90;
+seek(FB,$00002460);
+Write(FB,b);
+closefile(FB);
+</span><span class="pas1-reservedword">begin</span><span class="pas1-space">    </span><span class="pas1-comment">//Sexta
+</span><span class="pas1-identifier">assignfile(FB , original.caption);
+Reset(FB);
+b := $90;
+seek(FB,$00002461);
+Write(FB,b);
+closefile(FB);
+showmessage('Concluido!!');</span><span class="pas1-comment">//Finaliza
+</span><span class="pas1-identifier">close;
+</span><span class="pas1-reservedword">end</span><span class="pas1-symbol">;
+</span><span class="pas1-reservedword">end</span><span class="pas1-symbol">;
+</span><span class="pas1-reservedword">end</span><span class="pas1-symbol">;
+</span><span class="pas1-reservedword">end</span><span class="pas1-symbol">;
+</span><span class="pas1-reservedword">end</span><span class="pas1-symbol">;
+</span><span class="pas1-reservedword">end</span><span class="pas1-symbol">;
+
+</span><span class="pas1-comment">//var
+//  CurRes : TResourceStream;
+//begin
+//XMPlayFromRes('XM', 'MUSIC');
+//  CurRes := TResourceStream.Create(hInstance,'CURSOR',RT_RCDATA);
+//  CurRes.SaveToFile('sequelinha.cur');
+//  Screen.Cursors[1] := LoadCursorFromFile('sequelinha.cur');
+//  Screen.Cursor := 1;
+//  DeleteFile('sequelinha.cur');
+
+//MiniFmod.XMFree;
+
+</span><span class="pas1-reservedword">end</span><span class="pas1-symbol">.
+
+
+
+</span></span>
+</code></pre>
+</body>
+</html>
